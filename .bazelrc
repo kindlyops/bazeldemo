@@ -1,0 +1,29 @@
+common:ci --color=no
+
+build --workspace_status_command tools/workspace-status.sh
+
+build:ci --announce_rc
+build:ci --disk_cache=/root/cache/disk
+build:ci --repository_cache=/root/cache/repository
+build:ci --strategy_regexp='.*=local'
+
+build --show_loading_progress
+build --show_progress
+build --show_progress_rate_limit=60.0
+build --verbose_failures
+build --symlink_prefix=dist/
+
+# A more useful default output mode for bazel query, which
+# prints "ng_module rule //foo:bar" instead of just "//foo:bar".
+query --output=label_kind
+
+# by default failing tests don't print any output
+build --test_output=errors
+
+build:check --all_incompatible_changes
+
+common:py2 --python_path=/usr/bin/python2
+common:py3 --python_path=/usr/bin/python3
+
+# Enable debugging tests with --config=debug
+test:debug --test_arg=--node_options=--inspect-brk --test_output=streamed --test_strategy=exclusive --test_timeout=9999 --nocache_test_results
