@@ -26,6 +26,7 @@ py_library(
 
 pkg_zip(
     name = "antivirus_deploy.zip",
+    args = "",
     deps = [
         ":lib",
     ],
