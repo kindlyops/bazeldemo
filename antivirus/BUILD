@@ -1,4 +1,4 @@
-load("//:ziphelper.bzl", "pkg_zip")
+load("//:ziphelper.bzl", "pkg_zip", "python_pkg_zip")
 load(
     "@python//:requirements.bzl",
     "requirement",
@@ -7,7 +7,7 @@ load(
 
 # TODO: how do we get the python dependencies into the lambda zip?
 # bazel build //antivirus:antivirus_deploy.zip
-# unzip -vl bazel-bin/antivirus/pkg_antivirus_deploy.zip
+# unzip -vl dist/bazeldemo/bazel-out/darwin-fastbuild/bin/antivirus/pkg_antivirus_deploy.zip
 py_library(
     name = "lib",
     srcs = [
@@ -24,9 +24,8 @@ py_library(
     visibility = ["//visibility:public"],
 )
 
-pkg_zip(
+python_pkg_zip(
     name = "antivirus_deploy.zip",
-    args = "",
     deps = [
         ":lib",
     ],
