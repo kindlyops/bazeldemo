@@ -1,6 +1,6 @@
 common:ci --color=no
 
-build --workspace_status_command tools/workspace-status.sh
+build --workspace_status_command ./tools/workspace-status.sh
 
 build:ci --announce_rc
 build:ci --disk_cache=/root/cache/disk

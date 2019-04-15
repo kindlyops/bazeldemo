@@ -23,9 +23,21 @@ buildifier(
 
 load("//:ziphelper.bzl", "pkg_zip")
 
-pkg_zip(
-    name = "antivirus_stuff.zip",
-    deps = [
-        "@upside_bucket_antivirus//:build_av_artifacts",
-    ],
+# pkg_zip(
+#     name = "antivirus_stuff.zip",
+#     deps = [
+#         "@upside_bucket_antivirus//:build_av_artifacts",
+#     ],
+# )
+
+load("@bazel_gazelle//:def.bzl", "gazelle")
+
+# gazelle:prefix github.com/example/project
+gazelle(name = "gazelle")
+
+genrule(
+    name = "touch",
+    srcs = [],
+    outs = ["timestamp.txt"],
+    cmd = "touch $@",
 )
