@@ -34,34 +34,25 @@ pkg_zip = rule(
     },
 )
 
+# this is working but seems to be writing into the source tree which I think is illegal in bazel
+# also generating skylark errors
 def _python_pkg_zip_impl(ctx):
     files = " ".join(["%s" % dep.path for dep in ctx.files.deps])
-    temp_files = ["%s" % "/".join(f.path.split("/")[2:]) for f in ctx.files.deps]
-    temp_files_string = " ".join(temp_files)
-    #print(temp_files)
 
-    cmd = """
-echo -n "{contents}" | xargs -d ' ' -I % touch -t 200001010000 %
-zip -X {args} {path} {contents}
+    cmd_part1 = """
+file_array=($(echo "{contents}" {part2}
+zip {path} {part3}
 """
+    cmd_part2 = """| xargs -d ' ' -I SRC bash -c 'src_path=SRC && dest_path=${src_path#*/*/} && mkdir -p `dirname $dest_path` && cp -p $src_path $dest_path && echo $dest_path'))
+echo -n "${file_array[@]}" | xargs -d ' ' -I % touch -t 200001010000 %"""
+    cmd_part3 = "${file_array[@]}"
 
-    cmd = cmd.format(
+    cmd = cmd_part1.format(
         path = ctx.outputs.zip.path,
         contents = files,
-        args = ctx.attr.args,
+        part2 = cmd_part2,
+        part3 = cmd_part3,
     )
-
-    copy_cmd = """
-    echo -n "{contents}" | xargs -d ' ' -I % cp % @D
-    """
-
-    copy_cmd = cmd.format(contents = files)
-    ctx.actions.run_shell(
-        inputs = ctx.files.deps,
-        outputs = temp_files,
-        command = copy_cmd,
-    )
-    #print
 
     ctx.actions.run_shell(
         inputs = ctx.files.deps,

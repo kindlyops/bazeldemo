@@ -1,15 +1,16 @@
-load("//:ziphelper.bzl", "pkg_zip", "python_pkg_zip")
 load(
     "@python//:requirements.bzl",
     "requirement",
     py_requirement = "requirement",
 )
 
-# TODO: how do we get the python dependencies into the lambda zip?
-# bazel build //antivirus:antivirus_deploy.zip
-# unzip -vl dist/bazeldemo/bazel-out/darwin-fastbuild/bin/antivirus/pkg_antivirus_deploy.zip
-py_library(
-    name = "lib",
+py_binary(
+    name = "python_lambda_zipper",
+    srcs = ["python_lambda_zipper.py"],
+)
+
+genrule(
+    name = "antivirus_lambda",
     srcs = [
         "@com_github_upsidetravel_bucket-antivirus-function//:srcs",
         requirement("certifi"),
@@ -21,22 +22,7 @@ py_library(
         requirement("simplejson"),
         requirement("urllib3"),
     ],
-    visibility = ["//visibility:public"],
+    outs = ["pkg_antivirus_deploy.zip"],
+    cmd = "$(location :python_lambda_zipper) -o $@ $(SRCS)",
+    tools = [":python_lambda_zipper"],
 )
-
-python_pkg_zip(
-    name = "antivirus_deploy.zip",
-    deps = [
-        ":lib",
-    ],
-)
-
-# genrule(
-#     name = "antivirus_deploy",
-#     srcs = [
-#         "@com_github_upsidetravel_bucket-antivirus-function//:srcs",
-#     ],
-#     outs = ["antivirus_deploy.zip"],
-#     cmd = "$(location requirements.txt) $(location ramlToSwagger2) $(location swagger/3.0/api.yaml) $@",
-#     visibility = ["//visibility:public"],
-# )
